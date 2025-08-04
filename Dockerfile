@@ -1,5 +1,11 @@
 FROM maven:3.8.4-openjdk-17-slim AS build
 
+# Update package lists and upgrade installed packages
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy the Maven project files into the container
@@ -10,9 +16,16 @@ RUN mvn clean install
 RUN mvn dependency:copy-dependencies
 
 # Use a smaller image for deployment
-FROM openjdk:17-slim
+FROM openjdk:26-slim@sha256:16693571bfb14c180f7bac28a211357248f0374f4e61d5936db9df9f6bacd065
 
-LABEL org.opencontainers.image.base.name="openjdk:17-slim"
+LABEL org.opencontainers.image.base.name="openjdk:26-slim@sha256:16693571bfb14c180f7bac28a211357248f0374f4e61d5936db9df9f6bacd065"
+
+# Update package lists and upgrade installed packages
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # Set the working directory inside the container
 WORKDIR /app
 
